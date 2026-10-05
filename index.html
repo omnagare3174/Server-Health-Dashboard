@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application Health Dashboard</title>
+  <meta name="description" content="Ultra-Attractive Cyber Fintech Application Health Dashboard - 3 Node Single-Screen Command Center (1 Linux, 2 Windows)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=30" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2'><rect x='2' y='2' width='20' height='8' rx='2'/><rect x='2' y='14' width='20' height='8' rx='2'/><line x1='6' y1='6' x2='6.01' y2='6'/><line x1='6' y1='18' x2='6.01' y2='18'/></svg>" />
+</head>
+<body>
+
+  <!-- Background Ambient Orbs (Active in Dark Cyber Mode) -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- Futuristic AI UI Background Engine (Neural Canvas, Cyber Scanner & HUD Matrix) -->
+  <div class="ai-ui-background" id="aiUiBackground">
+    <canvas id="aiNeuralCanvas" class="ai-neural-canvas"></canvas>
+    <div class="ai-grid-scanner"></div>
+    <div class="ai-hud-corner tl"><span>AI_CORE // TELEMETRY_MATRIX</span></div>
+    <div class="ai-hud-corner tr"><span>SYS_TELEMETRY // LIVE</span></div>
+    <div class="ai-hud-corner bl"><span>INFLUX_PIPELINE: SYNCED</span></div>
+    <div class="ai-hud-corner br"><span>SINGLE_PANE // 3_NODES</span></div>
+  </div>
+
+  <div class="app-wrapper">
+    
+    <!-- Top Executive Command Bar -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <h1>
+            Application Health Dashboard
+          </h1>
+          <p>
+            <span class="neon-chip chip-emerald" id="clusterNodeCountBadge">● 3 NODES MONITORED</span>
+            <span class="brand-subtext" id="clusterNodeSubtext">1 Linux Server • 2 Windows Servers</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="header-tools">
+        <!-- InfluxDB Backend Status Badge -->
+        <div id="influxHeaderBadge" class="influx-header-chip" title="InfluxDB Telemetry Pipeline Status">
+          <span class="chip-status-dot"></span>
+          <span id="influxHeaderLabel">INFLUXDB CONNECTED</span>
+        </div>
+
+        <!-- Live Clock -->
+        <div id="liveClock" class="clock-widget">--:--:--.-- UTC</div>
+
+        <!-- Time Range Picker -->
+        <div class="range-picker">
+          <button class="range-btn active" onclick="setTimeFilter('1h', this)">1H</button>
+          <button class="range-btn" onclick="setTimeFilter('2h', this)">2H</button>
+          <button class="range-btn" onclick="setTimeFilter('12h', this)">12H</button>
+          <button class="range-btn" onclick="setTimeFilter('24h', this)">24H</button>
+        </div>
+
+        <!-- Dark / Light Theme Toggle Button -->
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <span id="themeIcon">🌙</span>
+          <span id="themeText">DARK MODE</span>
+        </button>
+
+        <!-- Refresh Telemetry Button -->
+        <button id="refreshBtn" class="neon-btn" onclick="fetchMetrics()" title="Refresh Telemetry">
+          <svg class="btn-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+          </svg>
+          <span>REFRESH</span>
+        </button>
+
+        <!-- AI Chatbot & Health Assistant Button (Replaces CSV Button) -->
+        <button id="chatbotToggleBtn" class="neon-btn primary chatbot-trigger-btn" onclick="toggleChatbot()" title="Open AI Health Assistant & Diagnostics">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2a8 8 0 0 0-8 8c0 3.4 2.1 6.3 5.1 7.4.2 0 .4.2.4.4v2.7c0 .4.5.7.8.4l3.1-2.5c.2-.2.4-.2.6-.2h6c4.4 0 8-3.6 8-8s-3.6-8-8-8z"/>
+            <circle cx="9" cy="10" r="1.2" fill="currentColor"/>
+            <circle cx="15" cy="10" r="1.2" fill="currentColor"/>
+          </svg>
+          <span>AI CHATBOT</span>
+          <span class="chat-live-pulse-badge">LIVE</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Server Command Grid -->
+    <section id="serverCardsSection" class="server-cards-section">
+      <div class="section-label">
+        <div class="section-label-left">
+          <span class="label-title">MONITORED CLUSTER NODES</span>
+          <span id="serverCountBadge" class="server-count-badge">3 NODES (1 LINUX • 2 WINDOWS)</span>
+        </div>
+        
+        <div class="node-filter-group" id="nodeFilterGroup">
+          <button class="node-filter-btn active" data-filter="all" onclick="setClusterFilter('all', this)">ALL (3)</button>
+          <button class="node-filter-btn" data-filter="linux" onclick="setClusterFilter('linux', this)">LINUX (1)</button>
+          <button class="node-filter-btn" data-filter="windows" onclick="setClusterFilter('windows', this)">WINDOWS (2)</button>
+        </div>
+
+        <!-- Interactive Card Stretch & Column Controls -->
+        <div class="card-stretch-control-bar" id="cardStretchControlBar">
+          <div class="stretch-hint-chip" title="Click and drag bottom-right corner or bottom edge of any card to stretch or minimize. Minimum info: CPU, RAM, DISK, SWAP">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+            </svg>
+            <span>CLICK &amp; STRETCH CARDS</span>
+          </div>
+
+          <div class="grid-columns-selector">
+            <span class="grid-col-lbl">COLS:</span>
+            <button class="col-btn active" data-cols="auto" onclick="setGridColumns('auto')" title="Responsive Auto Columns">AUTO</button>
+            <button class="col-btn" data-cols="3" onclick="setGridColumns('3')" title="3 Columns Grid">3</button>
+            <button class="col-btn" data-cols="2" onclick="setGridColumns('2')" title="2 Columns Grid">2</button>
+            <button class="col-btn" data-cols="1" onclick="setGridColumns('1')" title="1 Column Stack">1</button>
+          </div>
+        </div>
+      </div>
+      <div id="serverCardsGrid" class="server-cards-grid-12">
+        <!-- Injected dynamically via app.js -->
+      </div>
+    </section>
+
+    <!-- Bottom Telemetry Stream Bar (Single-Screen Fit) -->
+    <footer class="stream-footer-bar">
+      <div class="stream-bar-left">
+        <span class="live-beacon"></span>
+        <span id="statusText">InfluxDB Telemetry Stream Active</span>
+      </div>
+      <div class="stream-bar-center">
+        <span class="audit-chip">LIVE AUDIT</span>
+        <div id="eventsList" class="audit-ticker-stream">
+          <!-- Dynamically populated event stream -->
+        </div>
+      </div>
+      <div class="stream-bar-right">
+        <span id="lastSyncTime">Last sync: --:--:--</span>
+        <span class="env-target-badge" id="envTargetBadge">ORG: HDFC | BUCKET: Telegraf_server</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Server Telemetry Full-Page Inspect Command View -->
+  <div id="serverModalOverlay" class="server-fullpage-inspect-overlay" role="dialog" aria-modal="true" aria-labelledby="modalServerTitle">
+    <div class="server-fullpage-inspect-container">
+      
+      <!-- Full-Page Inspect Top Command Bar -->
+      <header class="inspect-top-bar">
+        <div class="inspect-nav-left">
+          <button class="neon-btn primary inspect-back-btn" onclick="closeServerDetails()" title="Return to Multi-Node Cluster Dashboard">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>BACK TO CLUSTER</span>
+          </button>
+          
+          <div class="inspect-node-identity">
+            <div class="inspect-title-group">
+              <span id="modalNodePulse" class="modal-pulse-dot healthy"></span>
+              <h2 id="modalServerTitle" class="inspect-server-title">linux-srv-01</h2>
+              <span id="modalStatusChip" class="modal-status-chip chip-healthy">OPERATIONAL [HEALTHY]</span>
+            </div>
+            <div id="modalServerMeta" class="inspect-server-meta">OS: Linux • Kernel: 5.15 • IP: 10.226.111.71</div>
+          </div>
+        </div>
+
+        <div class="inspect-nav-right">
+          <!-- View Mode Toggle -->
+          <div class="inspect-view-toggle">
+            <button class="view-toggle-btn active" id="btnSplitNoc" onclick="setInspectViewMode('split')" title="Single-Screen NOC Command View">📊 NOC SINGLE VIEW</button>
+            <button class="view-toggle-btn" id="btnPulseOnly" onclick="setInspectViewMode('pulse')" title="Full Infrastructure Pulse Graphs">📈 PULSE GRAPHS</button>
+          </div>
+
+          <!-- Time Range Picker -->
+          <div class="range-picker inspect-range-picker">
+            <button class="range-btn active" onclick="setTimeFilter('1h', this)">1H</button>
+            <button class="range-btn" onclick="setTimeFilter('2h', this)">2H</button>
+            <button class="range-btn" onclick="setTimeFilter('12h', this)">12H</button>
+            <button class="range-btn" onclick="setTimeFilter('24h', this)">24H</button>
+          </div>
+
+          <!-- Download PDF Button -->
+          <button class="neon-btn" onclick="downloadHealthReportPDF()" title="Download Health Report (PDF)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            <span>PDF REPORT</span>
+          </button>
+
+          <!-- Close Fullscreen Inspect Button -->
+          <button class="inspect-close-btn" onclick="closeServerDetails()" title="Close Full Page Inspect (Esc)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Full-Page Inspect Body -->
+      <main id="activeServerContainer" class="inspect-fullpage-body">
+        <!-- Injected via app.js -->
+      </main>
+
+      <!-- Full-Page Inspect Bottom Stream Bar -->
+      <footer class="inspect-bottom-bar">
+        <div class="inspect-footer-left">
+          <span class="live-beacon"></span>
+          <span id="modalLastUpdatedText">Live Telegraf InfluxDB High-Frequency Telemetry Stream Active</span>
+        </div>
+        <div class="inspect-footer-right">
+          <span>HOST INGESTION: 1.0s INTERVAL</span>
+          <span class="env-target-badge">FULL-PAGE NOC VIEW</span>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- AI Health Assistant Chatbot Drawer & Live Telemetry Inspector -->
+  <div id="chatbotOverlay" class="chatbot-drawer-overlay" onclick="handleChatbotBackdropClick(event)">
+    <div class="chatbot-drawer-panel" id="chatbotDrawerPanel" role="dialog" aria-modal="true" aria-labelledby="chatbotHeaderTitle">
+      
+      <!-- Chatbot Drawer Header -->
+      <div class="chatbot-header">
+        <div class="chatbot-header-brand">
+          <div class="chatbot-avatar-pulse">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 2a8 8 0 0 0-8 8c0 3.4 2.1 6.3 5.1 7.4.2 0 .4.2.4.4v2.7c0 .4.5.7.8.4l3.1-2.5c.2-.2.4-.2.6-.2h6c4.4 0 8-3.6 8-8s-3.6-8-8-8z"/>
+              <circle cx="9" cy="10" r="1.2" fill="currentColor"/>
+              <circle cx="15" cy="10" r="1.2" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <div class="chatbot-title-row">
+              <h3 id="chatbotHeaderTitle">AI Health Assistant</h3>
+              <span class="chatbot-live-status" id="chatbotTelegrafStatusBadge">● TELEGRAF LIVE</span>
+            </div>
+            <p class="chatbot-subtitle">Automated SRE Diagnostics & Real-time Telemetry Ingestion</p>
+          </div>
+        </div>
+
+        <div class="chatbot-header-actions">
+          <button class="chatbot-header-btn" onclick="downloadHealthReportPDF()" title="Download Health Report in PDF Format">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            <span>PDF</span>
+          </button>
+          <button class="chatbot-header-btn icon-only" onclick="clearChatHistory()" title="Clear Chat History">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+          <button class="chatbot-close-btn" onclick="toggleChatbot()" title="Close Chatbot (Esc)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Configuration & Models Bar -->
+      <div class="chatbot-config-bar">
+        <div class="model-select-wrap" title="Select AI Model">
+          <label for="chatModelSelect">MODEL:</label>
+          <select id="chatModelSelect" onchange="onModelChange(this.value)">
+            <option value="gemini-2.5-flash">Google Gemini 2.5 Flash (Fast, Recommended)</option>
+            <option value="gemini-2.5-pro">Google Gemini 2.5 Pro (Deep Diagnostics)</option>
+            <option value="gemini-1.5-flash">Google Gemini 1.5 Flash</option>
+            <option value="gemini-1.5-pro">Google Gemini 1.5 Pro</option>
+            <option value="local-telemetry-engine">Airgap Telemetry Engine (Offline Local SRE)</option>
+          </select>
+        </div>
+
+        <div class="api-key-toggle-wrap">
+          <button id="apiKeyToggleBtn" class="api-key-pill" onclick="toggleApiKeyConfig()" title="Configure API Key">
+            <span id="apiKeyPillDot" class="pill-dot"></span>
+            <span id="apiKeyPillLabel">API KEY</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Collapsible API Key Drawer -->
+      <div id="apiKeyConfigDrawer" class="api-key-config-drawer" style="display: none;">
+        <div class="api-key-input-row">
+          <input type="password" id="customApiKeyInput" placeholder="Enter Google Gemini API Key (or use .env)..." autocomplete="off" />
+          <button class="neon-btn primary" onclick="saveCustomApiKey()">SAVE</button>
+        </div>
+        <div class="api-key-help-note" id="apiKeyStatusNote">
+          API Key loaded from <code>.env</code> file (or enter a custom key above to override).
+        </div>
+      </div>
+
+      <!-- Quick Action Prompt Chips (Requested Prompts & Buttons) -->
+      <div class="chatbot-quick-actions">
+        <button class="quick-chip-btn highlight" onclick="triggerAnalyzeHealthCheck()" title="Run full automated health audit on all servers">
+          <span>🔍 Analyze Health Check</span>
+        </button>
+        <button class="quick-chip-btn pdf-btn" onclick="downloadHealthReportPDF()" title="Download signed executive health audit in PDF format">
+          <span>📄 Download Health Report (PDF)</span>
+        </button>
+        <button class="quick-chip-btn" onclick="triggerLiveTelegrafSnapshot()" title="Stream live Telegraf telemetry for all nodes">
+          <span>⚡ Live Telegraf Snapshot</span>
+        </button>
+        <button class="quick-chip-btn" onclick="triggerBottleneckCheck()" title="Check for >80% threshold violations">
+          <span>⚠️ Check Bottlenecks</span>
+        </button>
+      </div>
+
+      <!-- Live Telegraf Telemetry Stream Ticker Inside Chatbot -->
+      <div class="chatbot-live-telegraf-strip" id="chatTelegrafTicker">
+        <span class="ticker-beacon"></span>
+        <span class="ticker-label">LIVE TELEGRAF:</span>
+        <span id="chatTelegrafStatsText" class="ticker-values">Loading cluster telemetry stream...</span>
+      </div>
+
+      <!-- Chat History Container -->
+      <div class="chatbot-messages" id="chatbotMessages">
+        <!-- Welcoming message injected via app.js -->
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="chatbot-input-area">
+        <div class="chatbot-input-wrapper">
+          <textarea id="chatMessageInput" rows="1" placeholder="Ask about cluster health, Telegraf metrics, high CPU/RAM, or click 'Analyze Health Check'..." onkeydown="handleChatInputKey(event)"></textarea>
+          <div class="chat-input-toolbar">
+            <span class="chat-context-tag" title="Real-time cluster telemetry automatically sent with every query">
+              <span class="pulse-tiny"></span> Live Telemetry Attached
+            </span>
+            <button id="chatSendBtn" class="chat-send-btn" onclick="sendChatMessage()" title="Send Message (Enter)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js?v=30"></script>
+</body>
+</html>

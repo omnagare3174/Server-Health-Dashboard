@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application Health Dashboard</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --card-bg: #141414;
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text: #e4e4e4;
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --accent: #3b82f6;
+      --alert: #ff3b30;
+      --alert-bg: rgba(255, 59, 48, 0.1);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+    }
+
+    .title-group h1 {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 2.5rem;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .title-group p {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    button {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.6rem 1.2rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .alert-banner {
+      background: var(--alert-bg);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      color: var(--alert);
+      padding: 1rem;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 640px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card.alert {
+      border-color: var(--alert);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .card-value {
+      font-size: 2.25rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+
+    .chart-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 280px;
+      position: relative;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .status-badge {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      margin-right: 6px;
+    }
+
+    .status-badge.alert {
+      background: var(--alert);
+    }
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-group">
+        <h1>🖥️ Application Health</h1>
+        <p>Debos // Python Airgap Server Feed</p>
+      </div>
+      <div class="actions">
+        <button id="refreshBtn" onclick="fetchMetrics()">
+          <span id="spinIcon">↻</span> REFRESH_DATA
+        </button>
+        <button id="exportBtn" onclick="exportCSV()">
+          ↓ EXPORT_LOGS.CSV
+        </button>
+      </div>
+    </header>
+
+    <div id="alertBanner" class="alert-banner">
+      ⚠️ <span id="alertText">High Resource Utilization Detected!</span>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid-4">
+      <div class="card" id="cpuCard">
+        <div class="card-header">
+          <span>CPU Usage</span>
+          <span>⚡</span>
+        </div>
+        <div class="card-value" id="cpuVal">--%</div>
+      </div>
+
+      <div class="card" id="memCard">
+        <div class="card-header">
+          <span>Memory Usage</span>
+          <span>🧠</span>
+        </div>
+        <div class="card-value" id="memVal">--%</div>
+      </div>
+
+      <div class="card" id="swapCard">
+        <div class="card-header">
+          <span>Swap Memory</span>
+          <span>💾</span>
+        </div>
+        <div class="card-value" id="swapVal">--%</div>
+      </div>
+
+      <div class="card" id="diskCard">
+        <div class="card-header">
+          <span>File System</span>
+          <span>🗄️</span>
+        </div>
+        <div class="card-value" id="diskVal">--%</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-card">
+      <div class="chart-title">
+        <span>Resource Utilization Over Time</span>
+        <span style="font-size: 0.75rem; color: var(--text-muted);"><span class="status-badge"></span>LIVE 60m</span>
+      </div>
+      <div class="chart-container">
+        <svg id="chartSvg" viewBox="0 0 800 240" preserveAspectRatio="none">
+          <!-- Grid Lines -->
+          <line x1="0" y1="40" x2="800" y2="40" stroke="rgba(255,255,255,0.05)" />
+          <line x1="0" y1="100" x2="800" y2="100" stroke="rgba(255,255,255,0.05)" />
+          <line x1="0" y1="160" x2="800" y2="160" stroke="rgba(255,255,255,0.05)" />
+          <line x1="0" y1="220" x2="800" y2="220" stroke="rgba(255,255,255,0.05)" />
+          
+          <!-- Area and Paths -->
+          <polygon id="cpuArea" points="" fill="rgba(59, 130, 246, 0.15)" />
+          <polyline id="cpuPath" points="" fill="none" stroke="#3b82f6" stroke-width="2.5" />
+          
+          <polygon id="memArea" points="" fill="rgba(16, 185, 129, 0.10)" />
+          <polyline id="memPath" points="" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="4" />
+        </svg>
+      </div>
+      <div style="display: flex; gap: 1.5rem; font-size: 0.75rem; color: var(--text-muted);">
+        <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <span style="width: 12px; height: 3px; background: #3b82f6; display: inline-block;"></span> CPU Usage (%)
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <span style="width: 12px; height: 3px; background: #10b981; display: inline-block;"></span> Memory Usage (%)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let metricsData = [];
+
+    async function fetchMetrics() {
+      const spinIcon = document.getElementById('spinIcon');
+      spinIcon.classList.add('spin');
+
+      try {
+        const response = await fetch('/api/metrics');
+        if (!response.ok) throw new Error('Failed to fetch metrics');
+        metricsData = await response.json();
+        renderDashboard();
+      } catch (err) {
+        console.error('Error fetching metrics:', err);
+      } finally {
+        setTimeout(() => spinIcon.classList.remove('spin'), 500);
+      }
+    }
+
+    function renderDashboard() {
+      if (!metricsData || metricsData.length === 0) return;
+
+      const latest = metricsData[metricsData.length - 1];
+
+      // Update stat cards
+      document.getElementById('cpuVal').textContent = `${latest.cpuUsage}%`;
+      document.getElementById('memVal').textContent = `${latest.memoryUsage}%`;
+      document.getElementById('swapVal').textContent = `${latest.swapMemory}%`;
+      document.getElementById('diskVal').textContent = `${latest.fileSystem}%`;
+
+      // Check alerts
+      const alertBanner = document.getElementById('alertBanner');
+      const alertText = document.getElementById('alertText');
+      if (latest.cpuUsage > 85 || latest.memoryUsage > 85) {
+        alertBanner.style.display = 'flex';
+        alertText.textContent = `CRITICAL ALERT: High system usage (CPU: ${latest.cpuUsage}%, Mem: ${latest.memoryUsage}%)`;
+      } else {
+        alertBanner.style.display = 'none';
+      }
+
+      // Draw SVG Chart
+      const width = 800;
+      const height = 240;
+      const pointsCount = metricsData.length;
+
+      let cpuPoints = [];
+      let memPoints = [];
+
+      metricsData.forEach((d, i) => {
+        const x = (i / (pointsCount - 1)) * width;
+        const cpuY = height - (d.cpuUsage / 100) * (height - 20) - 10;
+        const memY = height - (d.memoryUsage / 100) * (height - 20) - 10;
+
+        cpuPoints.push(`${x.toFixed(1)},${cpuY.toFixed(1)}`);
+        memPoints.push(`${x.toFixed(1)},${memY.toFixed(1)}`);
+      });
+
+      document.getElementById('cpuPath').setAttribute('points', cpuPoints.join(' '));
+      document.getElementById('memPath').setAttribute('points', memPoints.join(' '));
+
+      document.getElementById('cpuArea').setAttribute('points', `0,${height} ${cpuPoints.join(' ')} ${width},${height}`);
+      document.getElementById('memArea').setAttribute('points', `0,${height} ${memPoints.join(' ')} ${width},${height}`);
+    }
+
+    function exportCSV() {
+      if (metricsData.length === 0) return;
+      const headers = Object.keys(metricsData[0]).join(',');
+      const rows = metricsData.map(r => Object.values(r).join(','));
+      const csvContent = "data:text/csv;charset=utf-8," + [headers, ...rows].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `server_health_${new Date().toISOString()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Initial load and polling every 5 seconds
+    fetchMetrics();
+    setInterval(fetchMetrics, 5000);
+  </script>
+</body>
+</html>
