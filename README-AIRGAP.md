@@ -29,10 +29,7 @@ You do **NOT** need internet or `pip install` to run the web dashboard!
 1. Copy the project folder to your air-gapped server.
 2. Confirm the `.env` file is present (or default settings in `server.py`):
    ```env
-   INFLUX_URL="https://10.226.111.68:8086"
-   INFLUX_TOKEN="gewpi-aZwWm6wByDjVMlYccxbhTGDnY9-ULYRx0N7SLBuHncHkhk2etzYd_J1zxOlAX5MicoS7ZxPsCbvVtxjQ=="
-   INFLUX_ORG="HDFC"
-   INFLUX_BUCKET="Telegraf_server"
+   
    ```
 3. Start the dashboard server:
    ```bash
